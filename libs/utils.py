@@ -83,10 +83,10 @@ def tensorflow_quantile_loss(y, y_pred, quantile):
             quantile))
 
   prediction_underflow = y - y_pred
-  q_loss = quantile * tf.maximum(prediction_underflow, 0.) + (
-      1. - quantile) * tf.maximum(-prediction_underflow, 0.)
+  q_loss = quantile * tf.math.maximum(prediction_underflow, 0.) + (
+      1. - quantile) * tf.math.maximum(-prediction_underflow, 0.)
 
-  return tf.reduce_sum(q_loss, axis=-1)
+  return tf.math.reduce_sum(q_loss, axis=-1)
 
 
 def numpy_normalised_quantile_loss(y, y_pred, quantile):
@@ -156,26 +156,19 @@ def get_default_tensorflow_config(tf_device='gpu', gpu_id=0):
   return tf_config
 
 
-def save(tf_session, model_folder, cp_name, scope=None):
+def save(model, model_folder, cp_name):
   """Saves Tensorflow graph to checkpoint.
 
   Saves all trainiable variables under a given variable scope to checkpoint.
 
   Args:
-    tf_session: Session containing graph
+    model: Tensorflow model
     model_folder: Folder to save models
     cp_name: Name of Tensorflow checkpoint
-    scope: Variable scope containing variables to save
   """
   # Save model
-  if scope is None:
-    saver = tf.train.Saver()
-  else:
-    var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope)
-    saver = tf.train.Saver(var_list=var_list, max_to_keep=100000)
-
-  save_path = saver.save(tf_session,
-                         os.path.join(model_folder, '{0}.ckpt'.format(cp_name)))
+  save_path = os.path.join(model_folder, '{0}.ckpt'.format(cp_name))
+  model.save_weights(save_path)
   print('Model saved to: {0}'.format(save_path))
 
 

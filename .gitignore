@@ -1,0 +1,5 @@
+tft_outputs/
+
+__pycache__/
+
+.vscode/
