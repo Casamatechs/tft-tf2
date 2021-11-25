@@ -182,6 +182,9 @@ def main(expt_name,
   print("Normalised Quantile Loss for Test Data: P50={}, P90={}".format(
       p50_loss.mean(), p90_loss.mean()))
 
+  attention_dict = model.get_attention(test)
+  print(attention_dict)
+
 
 if __name__ == "__main__":
 

@@ -1,0 +1,56 @@
+﻿TRUCK_SERIES,TRUCK_TYPE,AXLE_CONF,COMMERCIAL_NAME,TRUCK_ENGINE,MIN_WEIGHT,MAX_WEIGHT
+CF-Cab + H-Chassis,Tractor,4x2,FT,MX-11 - 10.8L,6500,40000
+CF-Cab + H-Chassis,Tractor,4x2,FT,Unknown Engine Type: E,6500,40000
+CF-Cab + H-Chassis,Rigid,4x2,FA,MX-13 - 12.9L,6350,40000
+CF-Cab + H-Chassis,Rigid,4x2,FA,MX-11 - 10.8L,6250,40000
+CF-Cab + H-Chassis,Tractor,4x2,FT,MX-13 - 12.9L,6500,40000
+CF-Cab + H-Chassis,Tractor,6x2,FTS/FTR/FTN,MX-13 - 12.9L,7800,50000
+CF-Cab + H-Chassis,Tractor,6x2,FTS/FTR/FTN,MX-11 - 10.8L,7800,50000
+CF-Cab + H-Chassis,Tractor,6x2,FTG/FTP,MX-13 - 12.9L,7300,50000
+CF-Cab + H-Chassis,Rigid,6x2,FAG/FAP,MX-11 - 10.8L,7600,40000
+CF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,Unknown Engine Type: E,7500,40000
+CF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,MX-13 - 12.9L,7750,40000
+CF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,PX-7 - Paccar/Cummins - 6.7L,7000,30500
+CF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,MX-11 - 10.8L,7500,40000
+CF-Cab + H-Chassis,Tractor,6x2,FTG/FTP,MX-11 - 10.8L,7300,50000
+CF-Cab + H-Chassis,Rigid,6x4,FAT,MX-11 - 10.8L,8750,40000
+CF-Cab + H-Chassis,Tractor,6x4,FTT,MX-13 - 12.9L,8750,50000
+CF-Cab + H-Chassis,Tractor,6x4,FTT,MX-11 - 10.8L,8750,50000
+CF-Cab + H-Chassis,Rigid,6x4,FAT,MX-13 - 12.9L,8850,50000
+CF-Cab + H-Chassis,Rigid,8x2,FAK/FAQ,MX-11 - 10.8L,9350,40000
+CF-Cab + H-Chassis,Rigid,8x2,FAC/FAX,MX-11 - 10.8L,9000,40000
+CF-Cab + H-Chassis,Rigid,8x2,FAK/FAQ,MX-13 - 12.9L,9350,40000
+CF-Cab + H-Chassis,Rigid,8x2,FAC/FAX,MX-13 - 12.9L,9000,40000
+CF-Cab + H-Chassis,Rigid,8x4,FAD,MX-11 - 10.8L,9150,35500
+CF-Cab + H-Chassis,Rigid,8x4,FAW,MX-13 - 12.9L,10000,43000
+CF-Cab + H-Chassis,Rigid,8x4,FAW,MX-11 - 10.8L,10000,43000
+CF-Cab + H-Chassis,Rigid,8x4,FAD,MX-13 - 12.9L,9850,50000
+CF-Cab + L-Chassis,Rigid,4x2,FA,PX-7 - Paccar/Cummins - 6.7L,5500,20000
+"LF-Cab + L-Chassis + 17,5"" Wheels",Rigid,4x2,FA,PX-7 - Paccar/Cummins - 6.7L,3500,12000
+"LF-Cab + L-Chassis + 17,5"" Wheels",Rigid,4x2,FA,PX-5 - Paccar/Cummins - 4.5L,3500,12000
+"LF-Cab + L-Chassis + 17,5"" Wheels",Rigid,4x2,FA,PX-5 - Paccar/Cummins - 3.8L,3100,8000
+"LF-Cab + L-Chassis + 19,5"" Wheels",Rigid,4x2,FA,PX-5 - Paccar/Cummins - 4.5L,4100,16000
+"LF-Cab + L-Chassis + 19,5"" Wheels",Tractor,4x2,FT,PX-7 - Paccar/Cummins - 6.7L,4400,21000
+"LF-Cab + L-Chassis + 19,5"" Wheels",Rigid,4x2,FA,PX-7 - Paccar/Cummins - 6.7L,4100,16000
+"LF-Cab + L-Chassis + 22,5"" Wheels",Rigid,4x2,FA,PX-7 - Paccar/Cummins - 6.7L,4900,19000
+XF-Cab + H-Chassis,Rigid,4x2,FA,MX-13 - 12.9L,7000,50000
+XF-Cab + H-Chassis,Rigid,4x2,FA,MX-11 - 10.8L,7000,50000
+XF-Cab + H-Chassis,Tractor,4x2,FT,MX-11 - 10.8L,7250,50000
+XF-Cab + H-Chassis,Tractor,4x2,FT,MX-13 - 12.9L,7250,50000
+XF-Cab + H-Chassis,Tractor,6x2,FTS/FTR/FTN,MX-11 - 10.8L,8350,50000
+XF-Cab + H-Chassis,Tractor,6x2,FTS/FTR/FTN,MX-13 - 12.9L,8350,50000
+XF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,MX-11 - 10.8L,8300,50000
+XF-Cab + H-Chassis,Tractor,6x2,FTG/FTP,MX-11 - 10.8L,7850,50000
+XF-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,MX-13 - 12.9L,8300,50000
+XF-Cab + H-Chassis,Tractor,6x2,FTG/FTP,MX-13 - 12.9L,7850,50000
+XF-Cab + H-Chassis,Rigid,6x4,FAT,MX-13 - 12.9L,9100,53000
+XF-Cab + H-Chassis,Tractor,6x4,FTT,MX-13 - 12.9L,9500,60000
+XF-Cab + H-Chassis,Rigid,8x2,FAK/FAQ,MX-11 - 10.8L,10000,50000
+XF-Cab + H-Chassis,Rigid,8x2,FAC/FAX,MX-13 - 12.9L,9450,50000
+XF-Cab + H-Chassis,Rigid,8x2,FAK/FAQ,MX-13 - 12.9L,10000,50000
+XF-Cab + H-Chassis,Rigid,8x2,FAC/FAX,MX-11 - 10.8L,9450,50000
+XF-Cab + H-Chassis,Rigid,8x4,FAD,MX-13 - 12.9L,10900,56000
+XF-Cab + H-Chassis,Tractor,8x4,FTM,MX-13 - 12.9L,10750,60000
+XF-Cab + H-Chassis,Rigid,8x4,FAW,MX-13 - 12.9L,10400,56000
+XF105 Series,Tractor,4x2,FT,MX - DAF/Paccar - 12.9L,0,0
+XG-Cab + H-Chassis,Rigid,6x2,FAS/FAR/FAN,MX-13 - 12.9L,8350,50000

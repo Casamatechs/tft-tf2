@@ -27,6 +27,7 @@ import data_formatters.favorita
 import data_formatters.traffic
 import data_formatters.volatility
 import data_formatters.daf_extended
+import data_formatters.wesad
 
 
 class ExperimentConfig(object):
@@ -43,7 +44,7 @@ class ExperimentConfig(object):
       experiment.
   """
 
-  default_experiments = ['volatility', 'electricity', 'traffic', 'favorita', 'daf']
+  default_experiments = ['volatility', 'electricity', 'traffic', 'favorita', 'daf', 'wesad']
 
   def __init__(self, experiment='volatility', root_folder=None):
     """Creates configs based on default experiment chosen.
@@ -83,7 +84,8 @@ class ExperimentConfig(object):
         'electricity': 'hourly_electricity.csv',
         'traffic': 'hourly_data.csv',
         'favorita': 'favorita_consolidated.csv',
-        'daf': '1q_2021_extended.csv'
+        'daf': 'tf_input_feb.csv',
+        'wesad': 'wesad_sliced.csv'
     }
 
     return os.path.join(self.data_folder, csv_map[self.experiment])
@@ -106,6 +108,7 @@ class ExperimentConfig(object):
         'traffic': data_formatters.traffic.TrafficFormatter,
         'favorita': data_formatters.favorita.FavoritaFormatter,
         'daf': data_formatters.daf_extended.DafExtendedFormatter,
+        'wesad': data_formatters.wesad.WesadFormatter,
     }
 
     return data_formatter_class[self.experiment]()

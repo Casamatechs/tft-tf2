@@ -85,7 +85,7 @@ def apply_gating_layer(x,
     
     return tf.keras.layers.Multiply()([activation_layer_output, gated_layer_output]), gated_layer_output
 
-def add_and_norm(x):
+def add_and_norm(x, name=None):
     """Applies skip connection followed by layer normalisation.
 
     Args:
@@ -95,7 +95,7 @@ def add_and_norm(x):
         Tensor output from layer.
     """
     add_layer_output = tf.keras.layers.Add()(x)
-    norm_layer_output = tf.keras.layers.LayerNormalization()(add_layer_output)
+    norm_layer_output = tf.keras.layers.LayerNormalization(name=name)(add_layer_output)
     return norm_layer_output
 
 def gated_residual_network(x,
@@ -104,7 +104,8 @@ def gated_residual_network(x,
                         dropout_rate = None,
                         use_time_distributed = True,
                         additional_context = None,
-                        return_gate = False):
+                        return_gate = False,
+                        name=None):
     """Applies the gated residual network (GRN) as defined in paper.
 
     Args:
@@ -151,9 +152,9 @@ def gated_residual_network(x,
                                             use_time_distributed=use_time_distributed,
                                             activation=None)
     if return_gate:
-        return add_and_norm([residual_connection,gating_layer]), gate
+        return add_and_norm([residual_connection,gating_layer], name=name), gate
     else:
-        return add_and_norm([residual_connection, gating_layer])
+        return add_and_norm([residual_connection, gating_layer], name=name)
 
 class ScaledDotProductAttention():
     """Defines scaled dot product attention layer (Equation 10).
@@ -771,7 +772,7 @@ class TemporalFusionTransformer(object):
             dropout_rate=self.dropout_rate,
             use_time_distributed=False)
 
-        def lstm_combine_and_mask(embedding):
+        def lstm_combine_and_mask(embedding, name=None):
             """Apply temporal variable selection networks.
 
             Args:
@@ -802,7 +803,7 @@ class TemporalFusionTransformer(object):
             )
 
             sparse_weights = tf.keras.layers.Softmax()(mlp_outputs)
-            sparse_weights = tf.expand_dims(sparse_weights,2)
+            sparse_weights = tf.expand_dims(sparse_weights,2,name=name)
 
             # Non-linear processing & weight application
             trans_emb_list = []
@@ -822,8 +823,8 @@ class TemporalFusionTransformer(object):
 
             return temporal_ctx, sparse_weights, static_gate
         
-        historical_features, historical_flags, _ = lstm_combine_and_mask(historical_inputs)
-        future_features, future_flags, _ = lstm_combine_and_mask(future_inputs)
+        historical_features, historical_flags, _ = lstm_combine_and_mask(historical_inputs, name='Historical_Inputs_GRN')
+        future_features, future_flags, _ = lstm_combine_and_mask(future_inputs, name='Future_Inputs_GRN')
 
         # LSTM Layer
 
@@ -939,7 +940,10 @@ class TemporalFusionTransformer(object):
         output_size = self.output_size
         quantile_loss = QuantileLossCalculator(valid_quantiles, output_size).quantile_loss
 
-        model.compile(loss=quantile_loss, optimizer=adam, sample_weight_mode='temporal')
+        model.compile(loss=quantile_loss, optimizer=adam, sample_weight_mode='temporal',metrics=[
+                tf.keras.metrics.RootMeanSquaredError(),
+                tf.keras.metrics.MeanAbsoluteError(),
+                ],)
 
         self._input_placeholder = all_inputs
 
@@ -1125,9 +1129,7 @@ class TemporalFusionTransformer(object):
             input_placeholder = self._input_placeholder
             attention_weights = {}
             for k in self._attention_components:
-                attention_weight = tf.keras.backend.get_session().run(
-                    self._attention_components[k],
-                    {input_placeholder: input_batch.astype(np.float32)})
+                attention_weight = self._attention_components[k].eval(input_batch.astype(np.float32))
                 attention_weights[k] = attention_weight
             return attention_weights
 

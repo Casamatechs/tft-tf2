@@ -19,6 +19,10 @@ import libs.utils as utils
 import sklearn.preprocessing
 
 import pandas as pd
+import os
+
+import calendar
+import time
 
 class DafExtendedFormatter(GenericDataFormatter):
     """Defines and formats data for the DAF extended dataset.
@@ -32,23 +36,28 @@ class DafExtendedFormatter(GenericDataFormatter):
     _column_definition = [
         ('END_DATETIME', DataTypes.DATE, InputTypes.TIME),
         ('DRIVERID', DataTypes.CATEGORICAL, InputTypes.ID),
-        ('TRUCKID', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('VIN', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('TRUCK_TYPE', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('AXLE_CONF', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('TRUCK_SERIES', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('TRUCK_ENGINE', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('TRUCK_SERIAL', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
-        ('TRIPID', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('TRUCK_TYPE', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('AXLE_CONF', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('COMMERCIAL_NAME', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('TRUCK_SERIES', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('TRUCK_ENGINE', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
         ('GROSS_WEIGHT', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('TRIP_DISTANCE', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('ALTITUDE_DELTA', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('USED_FUEL', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+        ('IDLE_FUEL', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('FUEL_CONSUMPTION', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+        ('CC_FUEL', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+        ('CC_FUEL_CONSUMPTION', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('CC_DIST', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('CC_ENABLED', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('BRAKEDURATION', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+        ('HARSHBRAKEDURATION', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
         ('DPA_SCORE', DataTypes.REAL_VALUED, InputTypes.TARGET),
+        ('CATEGORICAL_ID', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT),
+        ('INDEX_TRIP', DataTypes.REAL_VALUED, InputTypes.KNOWN_INPUT),
+        ('DAYOFWEEK', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
+        ('HOUROFDAY', DataTypes.CATEGORICAL, InputTypes.OBSERVED_INPUT),
     ]
 
     def __init__(self):
@@ -59,8 +68,11 @@ class DafExtendedFormatter(GenericDataFormatter):
         self._cat_scalers = None
         self._target_scaler = None
         self._num_classes_per_cat_input = None
+        self._train_filename = 'tf_input_train.csv'
+        self._valid_filename = 'tf_input_valid.csv'
+        self._test_filename = 'tf_input_test.csv'
 
-    def split_data(self, df, valid_boundary = None, test_boundary = None):
+    def split_data(self, df_train, df_valid, df_test, valid_boundary = None, test_boundary = None, path = None, overwrite = False):
         """Splits data frame into training-validation-test data frames.
 
         This also calibrates scaling object, and transforms data for each split.
@@ -73,41 +85,89 @@ class DafExtendedFormatter(GenericDataFormatter):
         Returns:
             Tuple of transformed (train, valid, test) data.
         """
+        # if not overwrite and path is not None and os.path.exists(os.path.join(path,self._train_filename)):
+        #     print('Loading stored training dataset...')
+        #     train = pd.read_csv(os.path.join(path,self._train_filename), index_col=0)
+        #     valid = pd.read_csv(os.path.join(path,self._valid_filename), index_col=0)
+        #     test = pd.read_csv(os.path.join(path,self._test_filename), index_col=0)
+        #     filtered_df = pd.concat([train, valid, test])
+        #     self.set_scalers(train)
 
-        total_time_steps = self.get_fixed_params()['total_time_steps']
-        filtered_df = df.copy()
-        trip_amount = df.DRIVERID.value_counts()
+        #     return (self.transform_inputs(data) for data in [train, valid, test])
+        
 
-        if valid_boundary is None:
-            valid_boundary = 0.2
-        if test_boundary is None:
-            test_boundary = 0.1
+        # total_time_steps = self.get_fixed_params()['total_time_steps']
+        # filtered_df = df.copy()
+        # trip_amount = df.DRIVERID.value_counts()
+
+        # if valid_boundary is None:
+        #     valid_boundary = 0.2
+        # if test_boundary is None:
+        #     test_boundary = 0.1
         
         # Gets rid of all the drivers that don't have enough trips recorded to fit the encoders for training, validation and test
-        filtered_df = filtered_df[filtered_df['DRIVERID'].isin(trip_amount[trip_amount * test_boundary > total_time_steps].index)]
+        # filtered_df = filtered_df[filtered_df['DRIVERID'].isin(trip_amount[trip_amount * test_boundary > total_time_steps].index)]
 
-        def split_series(df, valid_boundary, test_boundary):
-            train, valid, test = [], [], []
-            for driverid in df['DRIVERID'].unique():
-                driver_df = df[df['DRIVERID'] == driverid].copy()
-                number_steps = len(driver_df)
-                valid_size = int(number_steps * valid_boundary)
-                test_size = int(number_steps * test_boundary)
-                train_size = number_steps - valid_size - test_size
-                train.append(driver_df[:train_size])
-                valid.append(driver_df[train_size:train_size+valid_size])
-                test.append(driver_df[train_size+valid_size:])
-            train_df = pd.concat(train)
-            valid_df = pd.concat(valid)
-            test_df = pd.concat(test)
+        # def split_series(df, valid_boundary, test_boundary):
+        #     train, valid, test = [], [], []
+        #     counter = 0
+        #     number_drivers = df['DRIVERID'].nunique()
+        #     ts_o = time.time()
+        #     for driverid in df['DRIVERID'].unique():
+                # if counter % 1000 == 0:
+                #     ts_f = time.time() - ts_o
+                #     print('Processed {} out of {} drivers in {}ms'.format(counter, number_drivers, (ts_f * 1000)))
+                #     ts_o = time.time()
+        #         driver_df = df[df['DRIVERID'] == driverid].copy()
+        #         number_steps = len(driver_df)
+        #         driver_df['CATEGORICAL_ID'] = driver_df['DRIVERID']
+        #         driver_df['TIME_STEPS'] = list(range(0,number_steps))
+        #         valid_size = int(number_steps * valid_boundary)
+        #         test_size = int(number_steps * test_boundary)
+        #         train_size = number_steps - valid_size - test_size
+        #         train.append(driver_df[:train_size])
+        #         valid.append(driver_df[train_size:train_size+valid_size])
+        #         test.append(driver_df[train_size+valid_size:])
+        #         counter += 1
+        #     train_df = pd.concat(train, ignore_index=True)
+        #     valid_df = pd.concat(valid, ignore_index=True)
+        #     test_df = pd.concat(test, ignore_index=True)
+
+        #     if path is not None:
+        #         print('Writing splits in {}'.format(path))
+        #         train_df.to_csv(os.path.join(path,self._train_filename))
+        #         valid_df.to_csv(os.path.join(path,self._valid_filename))
+        #         test_df.to_csv(os.path.join(path,self._test_filename))
             
-            return train_df, valid_df, test_df
+        #     return train_df, valid_df, test_df
 
-        train, valid, test = split_series(filtered_df, valid_boundary, test_boundary)
+        # train, valid, test = split_series(filtered_df, valid_boundary, test_boundary)
 
-        self.set_scalers(train)
+        def preprocess_df(df_train, df_valid, df_test):
+            number_drivers = df_train['DRIVERID'].nunique()
+            counter = 0
+            ts_o = time.time()
+            df_train['CATEGORICAL_ID'] = df_train['DRIVERID']
+            df_valid['CATEGORICAL_ID'] = df_valid['DRIVERID']
+            df_test['CATEGORICAL_ID'] = df_test['DRIVERID']
+            # for driverid in df_train['DRIVERID'].unique():
+            #     if counter % 10 == 0:
+            #         ts_f = time.time() - ts_o
+            #         print('Processed {} out of {} drivers in {}ms'.format(counter, number_drivers, (ts_f * 1000)))
+            #         ts_o = time.time()
+            #     len_train = len(df_train[df_train['DRIVERID'] == driverid])
+            #     len_valid = len(df_valid[df_valid['DRIVERID'] == driverid])
+            #     len_test = len(df_test[df_test['DRIVERID'] == driverid])
+            #     df_valid[df_valid['DRIVERID'] == driverid]['INDEX_TRIP'] = list(range(len_train+1, len_train+1+len_valid))
+            #     df_test[df_test['DRIVERID'] == driverid]['INDEX_TRIP'] = list(range(len_train+len_valid+1, len_train+1+len_valid+len_test))
+            #     counter += 1
+            return df_train, df_valid, df_test
+        
+        df_train, df_valid, df_test = preprocess_df(df_train, df_valid, df_test)
+        
+        self.set_scalers(df_train)
 
-        return (self.transform_inputs(data) for data in [train, valid, test])
+        return (self.transform_inputs(data) for data in [df_train, df_valid, df_test])
 
 
 
@@ -214,5 +274,20 @@ class DafExtendedFormatter(GenericDataFormatter):
         }
 
         return fixed_params
+
+    def get_default_model_params(self):
+        """Returns default optimised model parameters."""
+
+        model_params = {
+            'dropout_rate': 0.2,
+            'hidden_layer_size': 20,
+            'learning_rate': 0.001,
+            'minibatch_size': 64,
+            'max_gradient_norm': 1.0,
+            'num_heads': 4,
+            'stack_size': 1
+        }
+
+        return model_params
 
     

@@ -1,0 +1,2 @@
+model_checkpoint_path: "wesad_checkpoint"
+all_model_checkpoint_paths: "wesad_checkpoint"
